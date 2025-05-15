@@ -6,13 +6,14 @@
 <body>
     <h1>My Todo List</h1>
     <a href="{% url 'todo_create' %}">Add Task</a>
-    <form method="get" action="{% url 'todo_list' %}">
-        <input type="text" name="search" placeholder="Search task name..." value="{{ request.GET.search }}">
-        <input type="hidden" name="filter" value="{{ request.GET.filter|default:'completed' }}">
-        <button type="submit">Search</button>
-    </form>
-    
     <form method="get" id="filterForm">
+        <div>
+            <label>
+                Search
+                <input type="text" name="search" placeholder="Search task name..." value="{{ request.GET.search }}">
+            </label>
+        </div>
+
         <label>
             <input type="radio" name="filter" value="all" {% if request.GET.filter == "all" %}checked{% endif %}>
             Show All
@@ -27,9 +28,9 @@
         </label>
     </form>
     <p>Number of todos: {{ todos|length }}</p>
-    <ul>
+    <ul id="todo-container">
         {% for todo in todos %}
-            <li>
+            <li class="todo-item">
                 <strong>{{ todo.task_name }}</strong>
                 {% if todo.is_completed %}
                     (Completed)
@@ -48,10 +49,30 @@
     </ul>
 
     <script>
-        document.querySelectorAll('input[name="filter"]').forEach((radio) => {
-            radio.addEventListener('change', () => {
-                document.getElementById('filterForm').submit();
+        const form = document.getElementById('filterForm');
+
+        const submitAjaxForm = () => {
+          const formData = new FormData(form);
+          const params = new URLSearchParams(formData).toString();
+
+          fetch("{% url 'todo_list' %}?" + params)
+            .then(response => response.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const newDoc = parser.parseFromString(html, 'text/html');
+              const newTodos = newDoc.querySelector('#todo-container');
+              document.querySelector('#todo-container').innerHTML = newTodos.innerHTML;
             });
+        };
+
+        let debounceTimer;
+        form.querySelector('input[name="search"]').addEventListener('input', () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(submitAjaxForm, 300);
+        });
+
+        form.querySelectorAll('input[name="filter"]').forEach(radio => {
+          radio.addEventListener('change', submitAjaxForm);
         });
     </script>
 </body>
