@@ -8,7 +8,14 @@ class TodoListView(ListView):
     context_object_name = 'todos'
 
     def get_queryset(self):
-        return Todo.objects.all()
+        filter_val = self.request.GET.get('filter', 'completed')
+
+        if filter_val == 'completed':
+            return Todo.objects.filter(is_completed=True)
+        elif filter_val == 'not_completed':
+            return Todo.objects.filter(is_completed=False)
+        else:
+            return Todo.objects.all()
 
 class TodoCreateView(CreateView):
     model = Todo

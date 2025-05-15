@@ -6,6 +6,20 @@
 <body>
     <h1>My Todo List</h1>
     <a href="{% url 'todo_create' %}">Add Task</a>
+    <form method="get" id="filterForm">
+        <label>
+            <input type="radio" name="filter" value="all" {% if request.GET.filter == "all" %}checked{% endif %}>
+            Show All
+        </label>
+        <label>
+            <input type="radio" name="filter" value="completed" {% if request.GET.filter == "completed" or not request.GET.filter %}checked{% endif %}>
+            Completed
+        </label>
+        <label>
+            <input type="radio" name="filter" value="not_completed" {% if request.GET.filter == "not_completed" %}checked{% endif %}>
+            Not Completed
+        </label>
+    </form>
     <p>Number of todos: {{ todos|length }}</p>
     <ul>
         {% for todo in todos %}
@@ -26,5 +40,13 @@
             <li>No tasks yet.</li>
         {% endfor %}
     </ul>
+
+    <script>
+        document.querySelectorAll('input[name="filter"]').forEach((radio) => {
+            radio.addEventListener('change', () => {
+                document.getElementById('filterForm').submit();
+            });
+        });
+    </script>
 </body>
 </html>
