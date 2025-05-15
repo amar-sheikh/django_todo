@@ -6,6 +6,12 @@
 <body>
     <h1>My Todo List</h1>
     <a href="{% url 'todo_create' %}">Add Task</a>
+    <form method="get" action="{% url 'todo_list' %}">
+        <input type="text" name="search" placeholder="Search task name..." value="{{ request.GET.search }}">
+        <input type="hidden" name="filter" value="{{ request.GET.filter|default:'completed' }}">
+        <button type="submit">Search</button>
+    </form>
+    
     <form method="get" id="filterForm">
         <label>
             <input type="radio" name="filter" value="all" {% if request.GET.filter == "all" %}checked{% endif %}>
