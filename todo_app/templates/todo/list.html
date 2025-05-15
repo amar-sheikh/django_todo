@@ -6,13 +6,15 @@
 <body>
     <h1>My Todo List</h1>
     <a href="{% url 'todo_create' %}">Add Task</a>
-    <p>Number of todos: {{ todos | length }}</p>
+    <p>Number of todos: {{ todos|length }}</p>
     <ul>
         {% for todo in todos %}
             <li>
                 <strong>{{ todo.task_name }}</strong>
                 {% if todo.is_completed %}
                     (Completed)
+                {% else %}
+                    (Not Completed)
                 {% endif %}
                 <br>
                 {{ todo.task_description|default:"No description" }}
