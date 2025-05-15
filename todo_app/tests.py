@@ -110,6 +110,26 @@ class TodoViewTests(TestCase):
         response = self.client.get(reverse('todo_list') + '?filter=completed')
         self.assertContains(response, self.todo_completed.task_name)
         self.assertNotContains(response, self.todo_not_completed.task_name)
+    
+    def test_todo_search_by_task_name_exact_match(self):
+        response = self.client.get(reverse('todo_list') + '?search=Completed Task&filter=all')
+        self.assertContains(response, self.todo_completed.task_name)
+        self.assertNotContains(response, self.todo_not_completed.task_name)
+
+    def test_todo_search_by_task_name_partial_match(self):
+        response = self.client.get(reverse('todo_list') + '?search=Incomplete&filter=all')
+        self.assertContains(response, self.todo_not_completed.task_name)
+        self.assertNotContains(response, self.todo_completed.task_name)
+
+    def test_todo_search_with_filter_completed(self):
+        response = self.client.get(reverse('todo_list') + '?search=Task&filter=completed')
+        self.assertContains(response, self.todo_completed.task_name)
+        self.assertNotContains(response, self.todo_not_completed.task_name)
+
+    def test_todo_search_no_results(self):
+        response = self.client.get(reverse('todo_list') + '?search=Nonexistent&filter=all')
+        self.assertNotContains(response, self.todo_completed.task_name)
+        self.assertNotContains(response, self.todo_not_completed.task_name)
 
     def test_create_todo(self):
         response = self.client.post(reverse('todo_create'), {
